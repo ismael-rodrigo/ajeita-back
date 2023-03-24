@@ -1,5 +1,7 @@
+import { Req } from '@nestjs/common/decorators';
+import { AuthGuard } from '@nestjs/passport';
+import { UseGuards } from '@nestjs/common/decorators';
 import { Body, Controller, ForbiddenException, Get, Param, Post, UseFilters } from '@nestjs/common';
-import { get } from 'http';
 import { UserCrudService } from '../services/user-crud.service';
 
 @Controller('user')
@@ -12,9 +14,11 @@ export class UserController {
   async registerUser(@Body() req:any) {
     return await this.userService.register(req)
   }
-  @Get(':id')
-  async getUser(@Param('id') id: string){
-    return await this.userService.getById(id)
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get()
+  async getUser(@Req() req: any){
+    return await this.userService.getById(req.user.id)
   }
 
 }

@@ -15,5 +15,11 @@ import { UserCrudService } from './services/user-crud.service';
             useClass: UserRepositoryPrisma
         }
     ],
+    exports:[
+        {
+            provide: UserRepository ,
+            useClass: UserRepositoryPrisma
+        }
+    ]
 })
 export class UserModule{}
