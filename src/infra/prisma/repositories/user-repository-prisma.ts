@@ -1,9 +1,9 @@
 import { BadRequestException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { User } from '@prisma/client';
-
 import { UserRepository } from 'src/domain/_ports/repository/user-repository/user-repository';
 import { PrismaClientProvider } from '../prisma-client';
+
 
 export class UserRepositoryPrisma extends PrismaClientProvider implements UserRepository {
     constructor(){ super(); }

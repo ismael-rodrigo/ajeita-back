@@ -13,16 +13,30 @@ datasource db {
 
 model User {
   id        String @default(uuid()) @id
+  cpf       String @unique
   email     String @unique
   password  String
+  phone     String
 
   posts     Post[]
+  
 }
 
 model Post {
-  id        String @default(uuid()) @id
+  id        Int @default(autoincrement()) @id
   title     String
-  content   String?
+  content   String
+  imageUrl  String
+ 
   author    User   @relation(fields: [authorId], references: [id])
   authorId  String
+
+  tag Tag @relation(fields: [tagId], references: [id])
+  tagId Int 
+}
+
+model Tag {
+  id    Int        @id @default(autoincrement())
+  name  String     @unique
+  posts Post[]
 }

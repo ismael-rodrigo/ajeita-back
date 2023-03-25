@@ -3,5 +3,4 @@ import { GenericCrudRepository } from 'src/domain/_ports/repository/generic-crud
 
 export abstract class UserRepository extends GenericCrudRepository<Prisma.UserCreateInput , User> {
     abstract fingByEmail(email:string):Promise<User | null>
-    
 }
