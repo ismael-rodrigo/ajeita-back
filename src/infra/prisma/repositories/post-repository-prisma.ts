@@ -1,3 +1,4 @@
+import { getQueryFromSearchPhrase } from './../../../../utils/get-query-from-search-phrase';
 import { BadRequestException } from '@nestjs/common';
 import { PrismaClientProvider } from './../prisma-client';
 import { Post, Prisma } from '@prisma/client';
@@ -9,21 +10,18 @@ export class PostRepositoryPrisma extends PrismaClientProvider implements PostRe
     constructor(){ super() }
 
     async postsPaginated({skip , take , search , tag}:{skip:number , take:number , tag?:number , search?:string }): Promise<Post[]> {
+        const _search = search ? getQueryFromSearchPhrase(search) : undefined
         try{
             const result = await this.client.post.findMany({
                 skip,
                 take,
                 where:{
-                    AND:[
-                        {
-                        OR:[
-                            { title:{ contains:search ? search : undefined } },
-                            { content:{ contains:search ? search : undefined } },
-                        ]
-                        },
+                    OR: _search && [
+                        { title: { search: _search }},
+                        { content: { search: _search }},
+                    ],
 
-                        { tagId: tag ? tag : undefined },
-                    ]
+                    tagId: tag ? tag:undefined
                 },
                 orderBy:{
                     id:'desc'

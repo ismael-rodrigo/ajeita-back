@@ -19,8 +19,12 @@ export class PostsPaginatedService {
     ){}
 
     async execute({ page , take , search , tag }:QueryPostsPagineted){
-        const skip = page < 1 ? 0 : (page - 1) * take
+        const _page = page < 1 ? 0 : (page - 1)
+        const _take =  take > 20 ? 20 : take
+        const skip = _page * _take
+
         const result = await this.postRepo.postsPaginated({ skip , take , search , tag })
+        
         return {
             page: page,
             take: take,
