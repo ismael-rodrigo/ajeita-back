@@ -1,3 +1,4 @@
+import { PostEntity } from '../../_entities/post/post';
 
 export abstract class GenericCrudRepository<InputData , OutputData> {
     abstract findMany():Promise<OutputData[]>

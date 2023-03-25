@@ -1,8 +1,10 @@
+import { HTTP_ERROR } from './../../../shared/errors-helper';
+import { PostEntity } from '../../../domain/_entities/post/post';
 import { getQueryFromSearchPhrase } from './../../../../utils/get-query-from-search-phrase';
-import { BadRequestException } from '@nestjs/common';
 import { PrismaClientProvider } from './../prisma-client';
 import { Post, Prisma } from '@prisma/client';
 import { PostRepository } from 'src/domain/_ports/repository/post-repository/post-repository';
+import { BadRequestException } from '@nestjs/common';
 
 
 
@@ -30,23 +32,55 @@ export class PostRepositoryPrisma extends PrismaClientProvider implements PostRe
             return result
         }
         catch(error){
-            throw new BadRequestException(error.message)
+            throw new BadRequestException(HTTP_ERROR.INTERNAL_ERROR_IN_REPOSITORY)
         }
     }
     findMany(): Promise<Post[]> {
         throw new Error('Method not implemented.');
     }
-    findById(id: string): Promise<Post> {
+    async findById(id: string): Promise<Post> {
+        try{
+            return await this.client.post.findUnique({
+                where:{
+                    id:Number(id)
+                }
+            })
+        }
+        catch(error){
+            throw new BadRequestException(HTTP_ERROR.INTERNAL_ERROR_IN_REPOSITORY)
+        }
+    }
+    async add(post: PostEntity): Promise<Post> {
+        try{
+            return await this.client.post.create({
+                data: {
+                    title:post.title.value,
+                    content:post.content.value,
+                    authorId:post.authorId,
+                    tagId: Number(post.tagId),
+                    imageUrl:post.imageUrl
+                }
+            })
+        }
+        catch(error){
+            throw new BadRequestException(HTTP_ERROR.INTERNAL_ERROR_IN_REPOSITORY)
+        }
+    }
+    update(id: string, params: PostEntity): Promise<Post> {
         throw new Error('Method not implemented.');
     }
-    add(params: Prisma.PostCreateInput): Promise<Post> {
-        throw new Error('Method not implemented.');
-    }
-    update(id: string, params: Prisma.PostCreateInput): Promise<Post> {
-        throw new Error('Method not implemented.');
-    }
-    remove(id: string): Promise<string> {
-        throw new Error('Method not implemented.');
+    async remove(id: string): Promise<string> {
+        try{
+            await this.client.post.delete({
+                where: {
+                    id:Number(id)
+                }
+            })
+            return 'ok'
+        }
+        catch(error){
+            throw new BadRequestException(HTTP_ERROR.INTERNAL_ERROR_IN_REPOSITORY)
+        }
     }
 }
     

@@ -1,6 +1,7 @@
 import { BadRequestException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { User } from '@prisma/client';
+import { UserEntity } from 'src/domain/_entities/user/user';
 import { UserRepository } from 'src/domain/_ports/repository/user-repository/user-repository';
 import { PrismaClientProvider } from '../prisma-client';
 
@@ -38,25 +39,35 @@ export class UserRepositoryPrisma extends PrismaClientProvider implements UserRe
         }
     }
 
-    async add(params: Prisma.UserCreateInput): Promise<User> {
+    async add(user: UserEntity): Promise<User> {
         try{
-            const result = await this.client.user.create({data:params})
-            return result
+            return await this.client.user.create({data:{
+                cpf:user.cpf.value,
+                email:user.email.value,
+                name:user.name.value,
+                password:user.password.value,
+                phone:user.phone.value,
+            }})
         }
         catch (error){
             throw new BadRequestException()
         }
     }
     
-    async update(id: string, params: Prisma.UserCreateInput): Promise<User> {
+    async update(id: string, user: UserEntity): Promise<User> {
         try{
-            const result = await this.client.user.update({
+            return await this.client.user.update({
                 where:{
                     id
                 },
-                data: params
+                data: {
+                    cpf:user.cpf.value,
+                    email:user.email.value,
+                    name:user.name.value,
+                    password:user.password.value,
+                    phone:user.phone.value,
+                }
             })
-            return result
         }
         catch (error){
             throw new BadRequestException()

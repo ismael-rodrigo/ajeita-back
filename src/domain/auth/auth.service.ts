@@ -1,3 +1,4 @@
+import { PasswordEntity } from '../_entities/generics/password';
 import { UserRepository } from 'src/domain/_ports/repository/user-repository/user-repository';
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
@@ -20,9 +21,9 @@ export class AuthService {
     }
 
     async validateUser(email:string , password:string){
-        const user = this.userRepo.fingByEmail(email)
+        const user = await this.userRepo.fingByEmail(email)
         if(!user) throw new BadRequestException()
-
+        if(! await PasswordEntity.compare(password , user.password)) throw new BadRequestException()
         return user
     }
 }
