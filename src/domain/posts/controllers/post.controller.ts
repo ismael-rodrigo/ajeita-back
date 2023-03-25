@@ -1,19 +1,21 @@
 import { OwnerPostGuard } from '../post.guard';
 import { RolesGuard } from '../../auth/roles.guard';
-import { PostEntity, PostEntityInput } from './../../../../dist/src/domain/_entities/post/post.entity.d';
 import { AuthGuard } from '@nestjs/passport';
-import { Delete, Param, SetMetadata, UseGuards } from '@nestjs/common/decorators';
+import { Delete, Param, SetMetadata, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common/decorators';
 import { PostsPaginatedService } from './../services/posts-paginated.service';
-import { Controller, Get, Query, Post, Req } from '@nestjs/common';
+import { Controller, Get, Query, Post, Req, HttpStatus, ParseFilePipeBuilder } from '@nestjs/common';
 import { PostCrudService } from '../services/post-crud.service';
 import { Roles } from 'src/main/guards/roles/set-roles.decorator';
-
+import { FileInterceptor } from '@nestjs/platform-express/multer/interceptors';
+import {Express} from 'express'
+import { BucketProvider } from 'src/domain/_ports/bucket-provider/bucket-provider.abstract';
 
 @Controller('post')
 export class PostController {
     constructor(
         private readonly postsPaginatedService:PostsPaginatedService,
-        private readonly postCrudService: PostCrudService
+        private readonly postCrudService: PostCrudService,
+        private readonly bucketProvider: BucketProvider
     ){}
 
     @Get('page')
@@ -45,6 +47,26 @@ export class PostController {
     }
 
 
+    @Post('upload')
+    @UseInterceptors(FileInterceptor('file'))
+    async uploadFile( @UploadedFile(
+        new ParseFilePipeBuilder()
+            .addFileTypeValidator({
+            fileType: /(gif|jpe?g|png)$/i
+            })
+            .addMaxSizeValidator({
+            maxSize: 100000
+            })
+            .build({
+            errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY
+            }),
+        )
+        file: Express.Multer.File,
+    ){
+        const urlUploadedFile = await this.bucketProvider.saveFile(file)
+        return urlUploadedFile
+    }
+    
 
 
 

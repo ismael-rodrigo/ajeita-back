@@ -1,3 +1,5 @@
+import { BucketProviderAwsS3 } from './../../infra/aws/s3-bucket/aws-s3-bucket-implementation';
+import { BucketProvider } from 'src/domain/_ports/bucket-provider/bucket-provider.abstract';
 import { PostRepositoryPrisma } from './../../infra/prisma/repositories/post-repository-prisma';
 import { PostRepository } from 'src/domain/_ports/repository/post-repository/post-repository';
 import { Module } from '@nestjs/common';
@@ -16,6 +18,10 @@ import { OwnerPostGuard } from './post.guard';
         {
             provide:PostRepository,
             useClass:PostRepositoryPrisma
+        },
+        {
+            provide:BucketProvider,
+            useClass:BucketProviderAwsS3
         }
     ],
     exports:[]
