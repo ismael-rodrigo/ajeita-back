@@ -3,6 +3,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { UseGuards } from '@nestjs/common/decorators';
 import { Body, Controller, ForbiddenException, Get, Param, Post, UseFilters } from '@nestjs/common';
 import { UserCrudService } from '../services/user-crud.service';
+import { RegisterUserInputDto, RegisterUserOutputDto } from './dtos/user.dto';
 
 @Controller('user')
 export class UserController {
@@ -11,8 +12,9 @@ export class UserController {
     ) {}
 
   @Post()
-  async registerUser(@Body() req:any) {
-    return await this.userService.register(req)
+  async registerUser(@Body() registerUserInput:RegisterUserInputDto): Promise<RegisterUserOutputDto> {
+    const result = await this.userService.register(registerUserInput)
+    return result
   }
 
   @UseGuards(AuthGuard('jwt'))

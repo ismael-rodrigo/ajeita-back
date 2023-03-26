@@ -1,12 +1,14 @@
 import { OwnerPostGuard } from '../post.guard';
 import { AuthGuard } from '@nestjs/passport';
-import { Delete, Param, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common/decorators';
+import { Body, Delete, Param, UploadedFile, UseGuards, UseInterceptors, UsePipes } from '@nestjs/common/decorators';
 import { PostsPaginatedService } from './../services/posts-paginated.service';
-import { Controller, Get, Query, Post, Req, HttpStatus, ParseFilePipeBuilder } from '@nestjs/common';
+import { Controller, Get, Query, Post, Req, HttpStatus, ParseFilePipeBuilder, ValidationPipe } from '@nestjs/common';
 import { PostCrudService } from '../services/post-crud.service';
 import { FileInterceptor } from '@nestjs/platform-express/multer/interceptors';
 import {Express} from 'express'
 import { BucketProvider } from 'src/domain/_ports/bucket-provider/bucket-provider.abstract';
+import { NewPostResponse } from './dtos/new-post.dto';
+import { classToPlain, plainToClass } from 'class-transformer';
 
 @Controller('post')
 export class PostController {
@@ -24,7 +26,7 @@ export class PostController {
 
     @UseGuards(AuthGuard('jwt'))
     @Post()
-    async create(@Req() req:any ){
+    async create(@Req() req:any ):Promise<NewPostResponse>{
         const payload = {
             title: req.body.title,
             content: req.body.title,
@@ -32,9 +34,9 @@ export class PostController {
             tagId: req.body.tagId,
             authorId: req.user.id
         }
-
         const postSaved = await this.postCrudService.create(payload)
-        return postSaved.id
+
+        return plainToClass(NewPostResponse , postSaved)
     }
 
 
@@ -60,14 +62,13 @@ export class PostController {
             })
             .build({
             errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY
-            }),
-        )
-        file: Express.Multer.File,
-    ){
-        const urlUploadedFile = await this.bucketProvider.saveFile(file)
-        const resultUpdate = await this.postCrudService.updateImageUrl(id , urlUploadedFile.url)
-        return { url : resultUpdate.imageUrl }
-    }
+            }))
+            file: Express.Multer.File ) {
+                
+            const urlUploadedFile = await this.bucketProvider.saveFile(file)
+            const resultUpdate = await this.postCrudService.updateImageUrl(id , urlUploadedFile.url)
+            return { url : resultUpdate.imageUrl }
+        }
     
 
 

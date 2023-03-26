@@ -1,7 +1,6 @@
 import { UserEntity } from '../../_entities/user/user';
-import { HttpException, Injectable } from '@nestjs/common';
-import { GenericCrudRepository } from 'src/domain/_ports/repository/generic-crud-repository';
-import { Prisma, User } from '@prisma/client';
+import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { UserRepository } from 'src/domain/_ports/repository/user-repository/user-repository';
 
 
@@ -14,7 +13,7 @@ export class UserCrudService {
     async register(params:Prisma.UserCreateInput){
         const userEntity = await UserEntity.create(params)
         const userSaved = await this.userRepo.add(userEntity)
-        return { id: userSaved.id }
+        return userSaved
     }
 
     getById(id:string){
