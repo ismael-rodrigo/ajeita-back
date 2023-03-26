@@ -7,7 +7,7 @@ import { PostCrudService } from '../services/post-crud.service';
 import { FileInterceptor } from '@nestjs/platform-express/multer/interceptors';
 import {Express} from 'express'
 import { BucketProvider } from 'src/domain/_ports/bucket-provider/bucket-provider.abstract';
-import { NewPostResponse } from './dtos/new-post.dto';
+import { NewPostRequestBody, NewPostResponse } from './dtos/post.dto';
 import { classToPlain, plainToClass } from 'class-transformer';
 
 @Controller('post')
@@ -26,17 +26,17 @@ export class PostController {
 
     @UseGuards(AuthGuard('jwt'))
     @Post()
-    async create(@Req() req:any ):Promise<NewPostResponse>{
+    async create(@Req() req:any , @Body() body:NewPostRequestBody ):Promise<NewPostResponse>{
         const payload = {
-            title: req.body.title,
-            content: req.body.title,
-            imageUrl: req.body.imageUrl,
-            tagId: req.body.tagId,
+            title: body.title,
+            content: body.title,
+            imageUrl: body.imageUrl,
+            tagId: body.tagId,
             authorId: req.user.id
         }
         const postSaved = await this.postCrudService.create(payload)
 
-        return plainToClass(NewPostResponse , postSaved)
+        return plainToClass( NewPostResponse , postSaved )
     }
 
 

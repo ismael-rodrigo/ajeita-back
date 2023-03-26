@@ -15,7 +15,6 @@ export type UserEntityInput = {
 
 
 export class UserEntity {
-x
     private constructor(
         public readonly cpf: CpfEntity,
         public readonly email: EmailEntity,

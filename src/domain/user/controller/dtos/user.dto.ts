@@ -24,24 +24,24 @@ export class RegisterUserInputDto {
     @IsString()
     public cpf: string;
 
-
 }
 
-export class RegisterUserOutputDto {
-    
-    @Expose()
-    public email: string
-    @Expose()
-    public name: string
-    @Expose()
-    public phone: string;
-    @Expose()
-    public cpf: string;
+@Exclude()
+export class UserAuthenticatedResponse {
+    @Expose() email: string
+    @Expose() name: string
+    @Expose() phone: string;
+    @Expose() cpf: string;
+    @Expose() id: string
+    @Exclude() password: string
+}
 
-    @Exclude()
-    public password: string
-
-    @Exclude()
-    public id: string
-
+@Exclude()
+export class UserPublicResponse {
+    @Expose() email: string
+    @Expose() name: string
+    @Expose() phone: string;
+    @Exclude() id: string
+    @Exclude() cpf: string;
+    @Exclude() password: string
 }
