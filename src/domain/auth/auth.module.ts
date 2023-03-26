@@ -7,17 +7,19 @@ import { AuthService } from './auth.service';
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './strategies/local.strategy';
 import { RolesGuard } from './roles.guard';
+import { RefreshTokenStrategy } from './strategies/refresh.strategy';
+import { ConfigService } from '@nestjs/config';
 
 
 
 @Module({
     imports: [
       PassportModule,
-      JwtModule.register({privateKey:process.env.JWT_SECRET_KEY }) ,
+      JwtModule.register({}) ,
       UserModule
     ],
     controllers:[AuthController],
-    providers:[ AuthService ,LocalStrategy , JwtStrategy , RolesGuard]
+    providers:[ AuthService , LocalStrategy , JwtStrategy ,RefreshTokenStrategy , RolesGuard ,ConfigService]
 
   })
 export class AuthModule {}

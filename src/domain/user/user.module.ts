@@ -6,7 +6,7 @@ import { UserCrudService } from './services/user-crud.service';
 
 
 @Module({
-    controllers: [UserController],
+    controllers: [ UserController ],
 
     providers: [
         UserCrudService,

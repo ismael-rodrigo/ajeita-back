@@ -20,10 +20,12 @@ export class PostCrudService {
         return await this.postRepository.findById(id)
     }
 
-
     async delete(id:string){
         return await this.postRepository.remove(id)
     }
 
+    async updateImageUrl( postId:string , imageUrl:string ){
+        return await this.postRepository.updateImageUrl(postId , imageUrl)
+    }
 
 }

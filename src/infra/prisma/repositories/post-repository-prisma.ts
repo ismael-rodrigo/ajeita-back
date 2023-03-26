@@ -11,6 +11,22 @@ import { BadRequestException } from '@nestjs/common';
 export class PostRepositoryPrisma extends PrismaClientProvider implements PostRepository {
     constructor(){ super() }
 
+    async updateImageUrl(postId: string, url: string): Promise<Post> {
+        try{
+            return await this.client.post.update({
+                where:{
+                    id:Number(postId)
+                },
+                data:{
+                    imageUrl:url
+                }
+            })
+        }
+        catch(error){
+            throw new BadRequestException(HTTP_ERROR.INTERNAL_ERROR_IN_REPOSITORY)
+        }
+    }
+
     async postsPaginated({skip , take , search , tag}:{skip:number , take:number , tag?:number , search?:string }): Promise<Post[]> {
         const _search = search ? getQueryFromSearchPhrase(search) : undefined
         try{

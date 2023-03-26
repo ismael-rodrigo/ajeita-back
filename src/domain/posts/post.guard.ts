@@ -15,6 +15,7 @@ export class OwnerPostGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const postId = request.params.id
     const userId = request.user.id;
+    console.log(postId , userId)
     const postRequired = await this.postRepository.findById(postId)
     if(!postRequired || !userId ) return false
     return postRequired.authorId == userId

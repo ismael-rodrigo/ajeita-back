@@ -1,11 +1,9 @@
 import { OwnerPostGuard } from '../post.guard';
-import { RolesGuard } from '../../auth/roles.guard';
 import { AuthGuard } from '@nestjs/passport';
-import { Delete, Param, SetMetadata, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common/decorators';
+import { Delete, Param, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common/decorators';
 import { PostsPaginatedService } from './../services/posts-paginated.service';
 import { Controller, Get, Query, Post, Req, HttpStatus, ParseFilePipeBuilder } from '@nestjs/common';
 import { PostCrudService } from '../services/post-crud.service';
-import { Roles } from 'src/main/guards/roles/set-roles.decorator';
 import { FileInterceptor } from '@nestjs/platform-express/multer/interceptors';
 import {Express} from 'express'
 import { BucketProvider } from 'src/domain/_ports/bucket-provider/bucket-provider.abstract';
@@ -39,6 +37,7 @@ export class PostController {
         return postSaved.id
     }
 
+
     @UseGuards(OwnerPostGuard)
     @Delete(':id')
     @UseGuards(AuthGuard('jwt'))
@@ -47,9 +46,11 @@ export class PostController {
     }
 
 
-    @Post('upload')
+    @UseGuards(OwnerPostGuard)
+    @Post(':id/image')
+    @UseGuards(AuthGuard('jwt'))
     @UseInterceptors(FileInterceptor('file'))
-    async uploadFile( @UploadedFile(
+    async uploadFile( @Param('id') id:string , @UploadedFile(
         new ParseFilePipeBuilder()
             .addFileTypeValidator({
             fileType: /(gif|jpe?g|png)$/i
@@ -64,7 +65,8 @@ export class PostController {
         file: Express.Multer.File,
     ){
         const urlUploadedFile = await this.bucketProvider.saveFile(file)
-        return urlUploadedFile
+        const resultUpdate = await this.postCrudService.updateImageUrl(id , urlUploadedFile.url)
+        return { url : resultUpdate.imageUrl }
     }
     
 

@@ -12,10 +12,16 @@ export class AuthController {
         return this.authService.login(req.user.id)
     }
 
+    @UseGuards(AuthGuard('jwt-refresh'))
+    @Get('refresh')
+    async refresh( @Req() req: any ){
+        return this.authService.generateTokens({ sub : req.user.id })
+    }
 
     @UseGuards(AuthGuard('jwt'))
-    @Get('me')
-    async me( @Req() req: any ){
-        return req.user
+    @Get('verify')
+    async verify(){
+        return { status : 'ok' }
     }
+
 }
